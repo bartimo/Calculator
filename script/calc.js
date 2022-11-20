@@ -8,13 +8,14 @@ const signButton = document.getElementById('signBtn');
 const plusButton = document.getElementById('plusBtn');
 const minusButton = document.getElementById('minusBtn');
 const equalButton = document.getElementById('equalBtn');
-
+const decimalButton = document.getElementById('decimalBtn');
 let newEquation = false;
 
 clearButton.addEventListener('click', () => handleClearClick());
 backButton.addEventListener('click', () => handleBackClick());
 signButton.addEventListener('click', () => handleSignClick());
 equalButton.addEventListener('click', () => handleEqualClick(true));
+decimalButton.addEventListener('click', () => handleDecimalClick());
 
 numButtons.forEach(btn => { 
     btn.addEventListener('click', () => handleNumClick(btn.textContent))
@@ -104,7 +105,7 @@ function handleSignClick() {
 
 function handleOperandClick(operand) {
     let calc = loadCalculator();
-
+    newEquation = false;
     if(calc.operand == '/' && calc.display == 0) {
         document.querySelector('.displayBox').textContent = "Err: Divide be zero"
         document.querySelector('.memoryBox').textContent = '';
@@ -130,6 +131,25 @@ function handleOperandClick(operand) {
     } else{
         document.querySelector('.memoryBox').textContent = calc.display + ` ${operand}`
         document.querySelector('.displayBox').textContent = '';;
+    }
+}
+
+function handleDecimalClick() {
+    calc = loadCalculator();
+
+    if(newEquation) {
+        handleClearClick();
+        newEquation = false;
+    }
+
+    if(calc.display.slice(0,4) == "Err:") {
+        handleClearClick()
+    } 
+
+    if(calc.display.includes('.')) {
+        return;
+    } else {
+        document.querySelector('.displayBox').textContent += '.';
     }
 }
 
