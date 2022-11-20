@@ -7,10 +7,13 @@ const backButton = document.getElementById('backBtn');
 const signButton = document.getElementById('signBtn');
 const plusButton = document.getElementById('plusBtn');
 const minusButton = document.getElementById('minusBtn');
+const equalButton = document.getElementById('equalBtn');
 
 clearButton.addEventListener('click', () => handleClearClick());
 backButton.addEventListener('click', () => handleBackClick());
 signButton.addEventListener('click', () => handleSignClick());
+equalButton.addEventListener('click', () => handleEqualClick());
+
 //plusButton.addEventListener('click', () => handlePlusClick());
 //minusButton.addEventListener('click', () => handleMinusClick());
 numButtons.forEach(btn => { 
@@ -23,9 +26,16 @@ operandButtons.forEach(btn => {
 
 //Button Click Handlers
 function handleNumClick(digit) {
-    let displayBoxLength = document.querySelector('.displayBox').textContent.length;
-    if(displayBoxLength <= MAX_DIGIT_DISPLAY) {
+    const calc = loadCalculator();
+    if(calc.display.length <= MAX_DIGIT_DISPLAY) {
         document.querySelector('.displayBox').textContent += digit;
+    }
+}
+
+function handleEqualClick() {
+    loadCalculator();
+    if(display.calc.length === 0 || memory.calc.length === 0) {
+        return
     }
 }
 
@@ -35,28 +45,27 @@ function handleClearClick() {
 }
 
 function handleBackClick() {
-    displayBoxLength = document.querySelector('.displayBox').textContent.length;
-    display = getDisplay();
-    if(displayBoxLength > 0) {
-        document.querySelector('.displayBox').textContent = display.slice(0,displayBoxLength-1);
+    calc = loadCalculator();
+    if(calc.display.length > 0) {
+        document.querySelector('.displayBox').textContent = calc.display.slice(0,calc.display.length-1);
     }
 }
 
 function handleSignClick() {
-    display = getDisplay();
-    document.querySelector('.displayBox').textContent = display * -1;
+    calc = loadCalculator();
+    document.querySelector('.displayBox').textContent = calc.display * -1;
 }
 
 function handleOperandClick(operand) {
-    display = getDisplay();
-    memory = getMemory();
+    const calc = loadCalculator();
+    console.log(calc);
 
-    if(display.length === 0 && memory.length === 0) {
+    if(calc.display.length === 0 && calc.memory.length === 0) {
         return;
-    } else if (display.length === 0) {
-        document.querySelector('.memoryBox').textContent = memory.slice(0,memory.length -1) + operand;
+    } else if (calc.display.length === 0) {
+        document.querySelector('.memoryBox').textContent = calc.memory + operand;
     } else {
-        document.querySelector('.memoryBox').textContent = display + ` ${operand}`
+        document.querySelector('.memoryBox').textContent = calc.display + ` ${operand}`
         document.querySelector('.displayBox').textContent = '';
     }
 }
@@ -68,5 +77,17 @@ function getDisplay() {
 }
 
 function getMemory() {
-    return document.querySelector('.memoryBox').textContent;
+    const memory = document.querySelector('.memoryBox').textContent;
+    return memory.slice(0,memory.length-1);
+}
+
+function getOperand() {
+    const memory = document.querySelector('.memoryBox').textContent
+    return document.querySelector('.memoryBox').textContent.slice(memory.length -1, memory.length);
+}
+
+function loadCalculator() {
+    const calcValues = {display:getDisplay(), memory:getMemory(), operand:getOperand()}
+    //console.log(calcValues)
+    return calcValues
 }
