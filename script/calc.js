@@ -24,6 +24,23 @@ operandButtons.forEach(btn => {
     btn.addEventListener('click', () => handleOperandClick(btn.textContent))
 });
 
+//Key press handlers
+document.addEventListener('keydown', function(event) {
+    const numbers = '1234567890';
+    const operands = '+-x/';
+    if(numbers.includes(event.key)) {
+        handleNumClick(event.key);
+    } else if (operands.includes(event.key)) {
+        handleOperandClick(event.key);
+    } else if (event.key = '*') {
+        handleOperandClick("x");
+    } else if (event.key == 'Enter') {
+        handleEqualClick(true);
+    } else if (event.key = '.') {
+        handleDecimalClick();
+    }   
+});
+
 
 //Button Click Handlers
 function handleNumClick(digit) {
