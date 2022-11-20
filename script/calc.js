@@ -9,13 +9,13 @@ const plusButton = document.getElementById('plusBtn');
 const minusButton = document.getElementById('minusBtn');
 const equalButton = document.getElementById('equalBtn');
 
+let newEquation = false;
+
 clearButton.addEventListener('click', () => handleClearClick());
 backButton.addEventListener('click', () => handleBackClick());
 signButton.addEventListener('click', () => handleSignClick());
-equalButton.addEventListener('click', () => handleEqualClick());
+equalButton.addEventListener('click', () => handleEqualClick(true));
 
-//plusButton.addEventListener('click', () => handlePlusClick());
-//minusButton.addEventListener('click', () => handleMinusClick());
 numButtons.forEach(btn => { 
     btn.addEventListener('click', () => handleNumClick(btn.textContent))
 });
@@ -27,16 +27,62 @@ operandButtons.forEach(btn => {
 //Button Click Handlers
 function handleNumClick(digit) {
     const calc = loadCalculator();
+    if(calc.display.slice(0,4) == "Err:") {
+        handleClearClick()
+    } 
+    
+    if(newEquation) {
+        handleClearClick();
+        newEquation = false;
+    }
+
     if(calc.display.length <= MAX_DIGIT_DISPLAY) {
         document.querySelector('.displayBox').textContent += digit;
     }
 }
 
-function handleEqualClick() {
-    loadCalculator();
-    if(display.calc.length === 0 || memory.calc.length === 0) {
+function handleEqualClick(fromButton) {
+    const calc = loadCalculator();
+    if (fromButton) {
+        newEquation = true;
+    }
+    
+    if(calc.display.slice(0,4) == "Err:") {
+        handleClearClick()
+        return;
+    } 
+
+    if(calc.display.length === 0 || calc.memory.length === 0) {
         return
     }
+    switch (calc.operand) {
+        case '+':
+            document.querySelector('.displayBox').textContent = +calc.memory + +calc.display;
+            document.querySelector('.memoryBox').textContent = '';
+            
+        break;
+
+        case '-':
+            document.querySelector('.displayBox').textContent = +calc.memory - +calc.display;
+            document.querySelector('.memoryBox').textContent = '';
+        break;
+
+        case 'x':
+            document.querySelector('.displayBox').textContent = +calc.memory * +calc.display;
+            document.querySelector('.memoryBox').textContent = '';
+        break;
+
+        case '/':
+            if(calc.display == 0) {
+                document.querySelector('.displayBox').textContent = "Err: Divide be zero"
+                document.querySelector('.memoryBox').textContent = '';
+                break;
+            } 
+            
+            document.querySelector('.displayBox').textContent = +calc.memory / +calc.display;
+            document.querySelector('.memoryBox').textContent = '';
+        break;    
+    } 
 }
 
 function handleClearClick() {
@@ -57,16 +103,33 @@ function handleSignClick() {
 }
 
 function handleOperandClick(operand) {
-    const calc = loadCalculator();
-    console.log(calc);
+    let calc = loadCalculator();
+
+    if(calc.operand == '/' && calc.display == 0) {
+        document.querySelector('.displayBox').textContent = "Err: Divide be zero"
+        document.querySelector('.memoryBox').textContent = '';
+        return;
+    }
+
+    if(calc.display.slice(0,4) === "Err:") {
+        handleClearClick();
+        return;
+    }
 
     if(calc.display.length === 0 && calc.memory.length === 0) {
         return;
     } else if (calc.display.length === 0) {
         document.querySelector('.memoryBox').textContent = calc.memory + operand;
-    } else {
+    } else if (calc.display.length !== 0 && calc.memory.length !== 0) {
+        //document.querySelector('.memoryBox').textContent = calc.display + ` ${operand}`
+        handleEqualClick(false);
+        calc = loadCalculator();
         document.querySelector('.memoryBox').textContent = calc.display + ` ${operand}`
         document.querySelector('.displayBox').textContent = '';
+        //handleOperandClick(operand);
+    } else{
+        document.querySelector('.memoryBox').textContent = calc.display + ` ${operand}`
+        document.querySelector('.displayBox').textContent = '';;
     }
 }
 
@@ -75,6 +138,7 @@ function handleOperandClick(operand) {
 function getDisplay() {
     return document.querySelector('.displayBox').textContent;
 }
+
 
 function getMemory() {
     const memory = document.querySelector('.memoryBox').textContent;
@@ -87,7 +151,11 @@ function getOperand() {
 }
 
 function loadCalculator() {
-    const calcValues = {display:getDisplay(), memory:getMemory(), operand:getOperand()}
+    const calcValues = {
+        display:getDisplay(), 
+        memory:getMemory(), 
+        operand:getOperand()
+    }
     //console.log(calcValues)
     return calcValues
 }
